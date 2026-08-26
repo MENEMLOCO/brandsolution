@@ -1,0 +1,73 @@
+/* ============================================================
+   Estados manejados por JavaScript en la versión HTML.
+   Se escriben como CSS para no depender de clases dinámicas.
+   ============================================================ */
+
+/* Header sticky */
+[data-header] {
+  border-bottom: 1px solid transparent;
+  background-color: transparent;
+}
+
+[data-header][data-scrolled="true"] {
+  border-bottom-color: var(--color-line);
+  background-color: color-mix(in srgb, var(--color-paper) 92%, transparent);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+[data-header-bar] {
+  height: 4.5rem;
+}
+
+[data-header][data-scrolled="true"] [data-header-bar] {
+  height: 4rem;
+}
+
+/* Acordeón */
+[data-accordion-item][data-open="true"] [data-accordion-icon] {
+  rotate: 180deg;
+  border-color: var(--color-brand-200);
+  background-color: var(--color-brand-50);
+  color: var(--color-brand-700);
+}
+
+[data-accordion-item] [id][role="region"] > div {
+  animation: bs-fade-up 0.5s var(--ease-out-soft) both;
+}
+
+/* Filtros de catálogo */
+[data-filter][aria-pressed="true"] {
+  border-color: var(--color-ink);
+  background-color: var(--color-ink);
+  color: #ffffff;
+}
+
+/* Barra de inscripción fija */
+[data-sticky-enroll] {
+  transform: translateY(100%);
+  transition: transform 0.3s var(--ease-out-soft);
+}
+
+[data-sticky-enroll][data-visible="true"] {
+  transform: translateY(0);
+}
+
+/* Campos con error */
+input[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+  border-color: var(--color-coral);
+}
+
+/* Tarjeta oculta por un filtro */
+[data-card][hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-accordion-item] [id][role="region"] > div,
+  [data-sticky-enroll] {
+    animation: none !important;
+    transition: none !important;
+  }
+}

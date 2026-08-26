@@ -1,58 +1,131 @@
 # Brand Solutions
 
 Sitio web de **Brand Solutions**, un espacio de formación y servicios en Marketing Digital e
-Inteligencia Artificial. Está construido con Next.js (App Router), TypeScript y Tailwind CSS v4,
-y se genera completamente estático: todas las rutas se prerenderizan en el build.
+Inteligencia Artificial.
+
+El repositorio contiene **dos versiones del mismo sitio**, con idéntico diseño y contenido:
+
+| Versión | Carpeta | Para qué sirve |
+| --- | --- | --- |
+| **HTML plano** | `html/` | Sitio listo para subir a cualquier hosting. Sin frameworks ni build. |
+| **Next.js** | `app/`, `components/` | Misma web con React y TypeScript, para escalar hacia una academia online. |
+
+Las dos comparten los mismos datos (`data/`), los mismos tokens de diseño (`app/globals.css`) y las
+mismas ilustraciones SVG, así que cualquier cambio de contenido o de estilo se refleja en ambas.
 
 ---
 
-## Puesta en marcha
+## Versión en HTML
+
+Es la versión recomendada si querés subir el sitio por FTP, a un hosting compartido, a GitHub Pages
+o a cualquier servidor estático.
+
+```
+html/
+├── index.html                     Home
+├── cursos/index.html              Catálogo de cursos
+├── cursos/<curso>/index.html      Landing de cada curso (6)
+├── programas/…                    Programas y su detalle (2)
+├── recursos/…                     Recursos y su detalle (6)
+├── servicios/index.html
+├── nosotros/index.html
+├── blog/index.html                Listado
+├── blog/<articulo>/index.html     Artículos (6)
+├── contacto/index.html
+├── login/index.html
+├── preguntas-frecuentes/  como-comprar/
+├── terminos-y-condiciones/  politica-de-privacidad/
+├── 404.html
+├── sitemap.xml   robots.txt
+└── assets/
+    ├── css/styles.css             Estilos compilados
+    ├── css/fonts.css              Tipografías
+    ├── fonts/*.woff2              Inter y Sora, alojadas en el propio sitio
+    ├── img/*.png                  Imágenes para redes sociales
+    ├── img/favicon.svg
+    └── js/main.js                 Todo el comportamiento del sitio
+```
+
+### Cómo usarla
+
+- **Ver el sitio:** abrí `html/index.html` con doble clic. Los enlaces son relativos, así que la
+  navegación funciona incluso sin servidor.
+- **Publicarla:** subí el contenido de `html/` a la raíz de tu hosting. No hace falta instalar nada.
+- **Editar textos:** abrí el `.html` de la página y cambiá el texto. No hay plantillas ocultas.
+
+### Configuración de `assets/js/main.js`
+
+Arriba del archivo hay un bloque `CONFIG` con dos valores:
+
+```js
+var CONFIG = {
+  formEndpoint: "",   // URL que recibe los formularios
+  checkoutUrl: "",    // URL base del checkout o de la plataforma de cursos
+};
+```
+
+- **`formEndpoint`**: pegá la URL de tu plataforma de email marketing o de tu endpoint propio. Los
+  tres formularios (recurso gratuito, newsletter y contacto) hacen un `POST` en JSON con los datos y
+  el nombre del formulario. Si queda vacía, muestran la confirmación sin enviar nada, para poder
+  probar la interfaz.
+- **`checkoutUrl`**: si la completás, los botones de compra apuntan ahí con
+  `?tipo=curso&item=<slug>`. Si queda vacía, llevan al formulario de contacto con el curso
+  preseleccionado.
+
+### Antes de publicar
+
+1. Reemplazá el dominio de ejemplo `https://www.brandsolutions.com` por el definitivo. Aparece en
+   las etiquetas `canonical`, en las de Open Graph, en `sitemap.xml` y en `robots.txt`.
+2. Completá los datos de contacto y las redes sociales.
+3. Reemplazá los testimonios de ejemplo: hoy son placeholders y el sitio lo avisa en pantalla.
+4. Revisá los textos legales con un asesor: son una base editable, no un documento definitivo.
+5. Configurá `formEndpoint` para que los formularios lleguen a algún lado.
+
+### Regenerar el HTML desde los datos
+
+Si preferís seguir editando el contenido en `data/` (útil para sumar cursos o artículos sin tocar
+el HTML), el sitio se vuelve a generar con:
 
 ```bash
 npm install
-npm run dev      # entorno de desarrollo en http://localhost:3000
-npm run build    # build de producción
-npm start        # sirve el build
-npm run typecheck
+npm run build:html
 ```
 
-Copiá `.env.example` como `.env.local` para conectar formularios y checkout.
+El comando reescribe por completo la carpeta `html/`, así que **los cambios hechos a mano en los
+`.html` se pierden**. Elegí un camino: o editás el HTML directamente, o editás `data/` y regenerás.
 
 ---
 
-## Estructura
+## Versión en Next.js
+
+```bash
+npm install
+npm run dev        # http://localhost:3000
+npm run build      # build de producción (todas las rutas estáticas)
+npm start
+npm run typecheck
+```
+
+Copiá `.env.example` como `.env.local` para conectar formularios (`NEXT_PUBLIC_FORM_ENDPOINT`) y
+checkout (`NEXT_PUBLIC_CHECKOUT_URL`).
 
 ```
-app/                     Rutas (App Router)
-  layout.tsx             Layout raíz: fuentes, metadata global, header y footer
-  page.tsx               Home
-  cursos/                Catálogo y landing de cada curso
-  programas/             Programas y su detalle
-  recursos/              Recursos digitales y su detalle
-  servicios/             Servicios de la agencia
-  nosotros/              Sobre Brand Solutions
-  blog/                  Listado y artículos
-  contacto/  login/      Contacto y acceso a la plataforma
-  preguntas-frecuentes/  como-comprar/  terminos-y-condiciones/  politica-de-privacidad/
-  sitemap.ts  robots.ts  opengraph-image.tsx  icon.svg
-
-components/
-  layout/                Header sticky, footer y encabezado de páginas internas
-  home/                  Secciones de la home
-  course/                Catálogo de cursos y barra de inscripción fija
-  shared/                Tarjetas, formularios y utilidades reutilizables
-  ui/                    Primitivas: Button, Section, Accordion, Carousel, Icon, Reveal…
-  visuals/               Ilustraciones SVG originales (hero, mockups, portadas, logo)
-
-data/                    Contenido editable (ver más abajo)
-lib/                     Utilidades: SEO, schema markup, formularios, checkout, estilos de acento
+app/                     Rutas (App Router), metadata, sitemap, robots e imágenes sociales
+components/layout/       Header sticky, footer y encabezado de páginas internas
+components/home/         Secciones de la home
+components/course/       Catálogo de cursos y barra de inscripción fija
+components/shared/       Tarjetas, formularios y utilidades reutilizables
+components/ui/           Button, Section, Accordion, Carousel, Icon, Reveal…
+components/visuals/      Ilustraciones SVG originales
+lib/                     SEO, schema markup, formularios, checkout y estilos de acento
+tools/                   Generador de la versión HTML
 ```
 
 ---
 
 ## Editar el contenido
 
-Todo el contenido vive en `data/` como objetos tipados. No hace falta tocar los componentes.
+Todo el contenido vive en `data/` como objetos tipados y alimenta a las dos versiones.
 
 | Archivo | Qué controla |
 | --- | --- |
@@ -62,57 +135,42 @@ Todo el contenido vive en `data/` como objetos tipados. No hace falta tocar los 
 | `data/resources.ts` | Recursos descargables (`price: 0` se muestra como “Gratis”) |
 | `data/posts.ts` | Artículos del blog, en bloques simples (`p`, `h2`, `ul`, `quote`, `callout`…) |
 | `data/services.ts` | Servicios de la agencia |
-| `data/testimonials.ts` | Testimonios (hoy son **placeholders**, ver abajo) |
+| `data/testimonials.ts` | Testimonios (hoy son **placeholders**) |
 | `data/instructors.ts` | Docentes |
 | `data/faqs.ts` | Preguntas frecuentes generales |
-| `data/types.ts` | Tipos compartidos |
 
 ### Agregar un curso nuevo
 
 1. Sumá un objeto al array `courses` en `data/courses.ts`.
 2. Elegí un `slug` único, un `accent` (`brand`, `signal`, `coral`, `cyan`, `amber`, `ink`) y un
    `visual` (la ilustración de portada, ver `data/types.ts`).
-3. Listo: aparece en la home, en `/cursos`, genera su landing `/cursos/[slug]`, su imagen social,
-   su entrada en el sitemap y su schema markup de tipo `Course`.
+3. Corré `npm run build:html` (y `npm run build` si usás la versión Next).
+
+Aparece en la home, en el catálogo, genera su landing, su entrada en el sitemap y su schema markup.
 
 ### Reemplazar los testimonios
 
-Los testimonios actuales son de ejemplo y están marcados con `placeholder: true`. Mientras quede
-alguno así, el sitio muestra un aviso en la sección de testimonios. Reemplazá nombre, rol, curso,
-comentario y valoración por datos reales y poné `placeholder: false`.
+Los testimonios están marcados con `placeholder: true` y el sitio muestra un aviso mientras quede
+alguno así. Cambiá nombre, rol, curso, comentario y valoración por datos reales y poné
+`placeholder: false`.
 
 ### Indicadores de experiencia
 
-Los valores de años de experiencia, proyectos, personas capacitadas y marcas acompañadas se editan
-en `site.stats` (`data/site.ts`). Si un valor todavía no está definido, poné `value: null` y se
-muestra un guion.
-
----
-
-## Formularios y ventas
-
-Los tres formularios (recurso gratuito, newsletter y contacto) usan `lib/forms.ts`.
-
-- Sin `NEXT_PUBLIC_FORM_ENDPOINT`, simulan el envío y muestran el estado de éxito. Sirve para
-  probar la interfaz.
-- Con la variable definida, hacen un `POST` con `{ form, ...datos }` en JSON a esa URL.
-
-Los botones de compra usan `lib/commerce.ts`. Sin `NEXT_PUBLIC_CHECKOUT_URL`, llevan al formulario
-de contacto con el curso preseleccionado. Con la variable definida, arman
-`<URL>?tipo=curso&item=<slug>`.
+Se editan en `site.stats` (`data/site.ts`). Si un valor todavía no está definido, poné `value: null`
+y se muestra un guion.
 
 ---
 
 ## Identidad visual
 
-La paleta, la tipografía, los radios, las sombras y las animaciones están declarados como tokens en
-el bloque `@theme` de `app/globals.css`. Cambiando ese bloque cambia todo el sitio.
+Los tokens de color, tipografía, radios, sombras y animaciones están en el bloque `@theme` de
+`app/globals.css`. Cambiando ese bloque cambian las dos versiones.
 
 - **Violeta** `#4a1fe0` — color primario de marca.
-- **Lima** `#cdf564` — acento de señal, resalta palabras estratégicas y CTAs sobre fondo oscuro.
+- **Lima** `#cdf564` — acento de señal: resalta palabras clave y CTAs sobre fondo oscuro.
 - **Papel** `#fcfbf8` — fondo cálido, con `#f4f2ec` para secciones alternas.
 - **Tinta** `#0c0a1d` — texto y bloques oscuros.
-- Tipografías: **Sora** para títulos e **Inter** para texto, cargadas con `next/font`.
+- Tipografías: **Sora** para títulos e **Inter** para texto, alojadas en el propio sitio.
 
 Todas las imágenes son **ilustraciones SVG propias** (`components/visuals/`): la composición del
 hero, los mockups de plataforma y certificado, y las portadas de cursos, recursos y artículos. No se
@@ -124,7 +182,7 @@ usan fotografías ni recursos gráficos de terceros.
 
 - `title` y `meta description` propios en cada página, con canonical y Open Graph/Twitter Cards.
 - Un solo `h1` por página y jerarquía `h2`/`h3` consistente.
-- Imágenes sociales generadas en el build: una general y una propia por curso y por artículo.
+- Imágenes sociales propias: una general y una por curso y por artículo.
 - `sitemap.xml` y `robots.txt` generados a partir de los datos.
 - Datos estructurados JSON-LD: `Organization`/`EducationalOrganization`, `WebSite`, `Course`,
   `Article`, `Product`, `FAQPage`, `BreadcrumbList` e `ItemList`.
@@ -136,23 +194,7 @@ usan fotografías ni recursos gráficos de terceros.
 
 - Mobile-first, sin scroll horizontal en ningún breakpoint.
 - Enlace “Saltar al contenido”, foco visible, menú móvil con `aria-expanded` y bloqueo de scroll.
-- Acordeones y carrusel operables con teclado y anunciados correctamente.
-- Las animaciones de aparición se desactivan con `prefers-reduced-motion: reduce`.
-- Todo el sitio es estático: sin dependencias de terceros en el cliente más allá de React.
-
----
-
-## Despliegue
-
-Al ser 100% estático, funciona en cualquier hosting de Next.js (Vercel, Netlify, Cloudflare) o en un
-servidor Node con `npm run build && npm start`.
-
-Antes de publicar:
-
-1. Actualizá `site.url` en `data/site.ts` con el dominio definitivo (de ahí salen canonical, sitemap
-   y schema markup).
-2. Completá contacto, redes e indicadores en `data/site.ts`.
-3. Reemplazá los testimonios de ejemplo.
-4. Revisá los textos legales de `/terminos-y-condiciones` y `/politica-de-privacidad` con un asesor
-   legal: son una base editable, no un documento definitivo.
-5. Definí las variables de entorno de formularios y checkout.
+- Acordeones, filtros y carrusel operables con teclado y anunciados correctamente.
+- Las animaciones se desactivan con `prefers-reduced-motion: reduce`.
+- La versión HTML no carga ninguna librería externa: un CSS, un JS de unos 17 KB y las tipografías
+  propias.

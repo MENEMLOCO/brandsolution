@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /login/
+
+Host: https://www.brandsolutions.com
+Sitemap: https://www.brandsolutions.com/sitemap.xml

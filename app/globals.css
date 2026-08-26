@@ -167,10 +167,10 @@
   padding-inline: 0.1em;
   background-image: linear-gradient(
     to top,
-    transparent 0.1em,
-    var(--color-signal-400) 0.1em,
-    var(--color-signal-400) 0.42em,
-    transparent 0.42em
+    transparent 0.06em,
+    var(--color-signal-400) 0.06em,
+    var(--color-signal-400) 0.34em,
+    transparent 0.34em
   );
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
